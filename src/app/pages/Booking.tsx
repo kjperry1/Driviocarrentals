@@ -26,16 +26,50 @@ export default function Booking() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [ageError, setAgeError] = useState('');
+
+  const calculateAge = (birthDate: string): number => {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
+
+    // Validate age when date of birth changes
+    if (name === 'dateOfBirth' && value) {
+      const age = calculateAge(value);
+      if (age < 25) {
+        setAgeError('You must be at least 25 years old to rent a vehicle.');
+      } else {
+        setAgeError('');
+      }
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Final age validation
+    if (formData.dateOfBirth) {
+      const age = calculateAge(formData.dateOfBirth);
+      if (age < 25) {
+        setAgeError('You must be at least 25 years old to rent a vehicle.');
+        return;
+      }
+    }
+
     setSubmitted(true);
     setTimeout(() => {
       navigate('/');
@@ -174,7 +208,7 @@ export default function Booking() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Date of Birth *
+                  Date of Birth * (Must be 25 or older)
                 </label>
                 <input
                   type="date"
@@ -182,8 +216,21 @@ export default function Booking() {
                   required
                   value={formData.dateOfBirth}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00D66A] focus:border-transparent"
+                  max={new Date(new Date().setFullYear(new Date().getFullYear() - 25)).toISOString().split('T')[0]}
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent ${
+                    ageError
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-gray-300 focus:ring-[#00D66A]'
+                  }`}
                 />
+                {ageError && (
+                  <p className="text-red-500 text-sm mt-2">{ageError}</p>
+                )}
+                {formData.dateOfBirth && !ageError && (
+                  <p className="text-[#00D66A] text-sm mt-2">
+                    Age: {calculateAge(formData.dateOfBirth)} years old ✓
+                  </p>
+                )}
               </div>
 
               <div>
@@ -447,7 +494,12 @@ export default function Booking() {
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <button
               type="submit"
-              className="flex-1 px-8 py-4 bg-[#00D66A] text-[#0A0F0D] rounded-lg font-medium text-lg hover:bg-[#00B356] transition-all hover:scale-105 hover:shadow-lg hover:shadow-[#00D66A]/30"
+              disabled={!!ageError}
+              className={`flex-1 px-8 py-4 rounded-lg font-medium text-lg transition-all ${
+                ageError
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-[#00D66A] text-[#0A0F0D] hover:bg-[#00B356] hover:scale-105 hover:shadow-lg hover:shadow-[#00D66A]/30'
+              }`}
             >
               Submit Reservation
             </button>

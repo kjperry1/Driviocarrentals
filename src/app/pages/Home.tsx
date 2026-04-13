@@ -126,7 +126,7 @@ export default function Home() {
             <div className="relative animate-slide-in-right">
               <div className="absolute inset-0 bg-gradient-to-br from-[#00D66A] to-[#00B356] rounded-3xl rotate-3"></div>
               <img
-                src="https://images.unsplash.com/photo-1593950315186-76a92975b60c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
+                src="https://images.unsplash.com/photo-1727893512947-8bdc773ceb02?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"
                 alt="Car rental for gig workers"
                 className="relative rounded-3xl w-full h-[400px] md:h-[500px] object-cover shadow-2xl"
               />
